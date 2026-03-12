@@ -201,6 +201,8 @@ def Main():
                 print("Thank you for playing")
                 ExitMenu = True
                 Playing = False
+            else:
+                print("Invalid choice.")
         if Playing:
             PlayGame()
     print("Press enter to continue")
