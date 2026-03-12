@@ -53,6 +53,17 @@ def DisplayBoard():
 def ConvertRefToCoords(Ref):
     Column = ord(Ref[0]) - 65
     Row = int(Ref[1]) - 1
+
+    # w2q5) explanation then code
+    # Task 1
+    # Column can easily be negative if a character under the character A is given
+    # Row is only negative where Ref[1] is the character 0 (as this would lead to a value of -1)
+    # The bounding is set by the dimensions above (global variables Width and Height)
+    if (Column < 0 or Column >= Width) or (Row == -1 or Row >= Height):
+        print("Out of bounds (or negative values calculated).")
+        return [] # return an empty list and appropriate message printed
+    # Task 1 end [coding end]
+
     if Row < Height and Column < Width:
         Coords = [Row, Column]
     else:
@@ -76,7 +87,12 @@ def ProcessMove(Move):
         FirstRef = Move
         SecondRef = Move
     StartCoords = ConvertRefToCoords(FirstRef)
-    EndCoords = ConvertRefToCoords(SecondRef)
+
+    if StartCoords != []: # w2q5) QoL fix, prevents multiple prints of the same error.
+        EndCoords = ConvertRefToCoords(SecondRef)
+    else:
+        return False # w2q5) may make the following code redundant?
+
     SquaresRemoved = 0 # w2q2) variable set
     if len(StartCoords) == 0 or len(EndCoords) == 0:
         return False
