@@ -171,7 +171,7 @@ def PlayGame():
 
 def Main():
     Playing = True
-    RandomOption = False
+    RandomOption = True # w2q3) set randomOption to True on default
     while Playing:
         ExitMenu = False
         while not ExitMenu:
