@@ -3,6 +3,8 @@
 # written by the AQA Programmer Team
 # developed using PyCharm Community Edition 2022
 
+# K6719's version -- Worksheet 3 in progress (Startpoint SPWorksheet2.py)
+
 # Version number 0.0.1
 
 import random
