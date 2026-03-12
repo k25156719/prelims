@@ -79,6 +79,26 @@ def ConvertCoordsToRef(Row, Column):
     return Ref
 
 def ProcessMove(Move):
+    # w2q6) allow an option for X, do this at the start
+    # scan from top to bottom then along rows for the first tile, remove it
+    if Move == "X":
+        tilesFound = 0
+
+        for column in range(Width):
+            for row in range(Height):
+                # loop from TOP to BOTTOM
+                if Board[row][column] == TILE:
+                    Board[row][column] = NO_TILE
+                    tilesFound += 1
+                    break
+
+            if tilesFound: # if a tile is found break out
+                break
+
+        print(f"{tilesFound} square(s) removed.")
+
+        return True # break out of function
+
     if "-" in Move:
         DashPos = Move.index("-")
         FirstRef = Move[0:DashPos]
