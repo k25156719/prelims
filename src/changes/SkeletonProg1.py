@@ -77,6 +77,7 @@ def ProcessMove(Move):
         SecondRef = Move
     StartCoords = ConvertRefToCoords(FirstRef)
     EndCoords = ConvertRefToCoords(SecondRef)
+    SquaresRemoved = 0
     if len(StartCoords) == 0 or len(EndCoords) == 0:
         return False
     if StartCoords[0] != EndCoords[0] and StartCoords[1] != EndCoords[1]:
@@ -92,7 +93,10 @@ def ProcessMove(Move):
         else:
             return False
     else:
-        ToRemove = EndCoords[0] - StartCoords[0] + 1
+        ToRemove = SquaresRemoved = EndCoords[0] - StartCoords[0] + 1
+        # edit w2q2) set squaresRemoved to toRemove's old value to preserve it
+        # .. as ToRemove becomes 0 over runtime
+
         for Cell in range(StartCoords[0], EndCoords[0] + 1):
             if Board[Cell][StartCoords[1]] == TILE:
                 ToRemove -= 1
@@ -101,6 +105,10 @@ def ProcessMove(Move):
                 Board[Cell][StartCoords[1]] = NO_TILE
         else:
             return False
+
+    print(SquaresRemoved, "squares removed.")
+    # edit w2q2) print out toRemove which stores the amount of squares removed
+
     return True
 
 def SetBoardSize():
