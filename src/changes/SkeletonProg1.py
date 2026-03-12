@@ -182,8 +182,10 @@ def Main():
             # w2q4) encapsulate in try except
             try:
                 UserInput = int(input("Enter a choice: "))
-            except TypeError:
+            except ValueError: # NOTE: int returns a ValueError upon not working properly.
                 print("Invalid choice.")
+                continue # continue to avoid the if statements (performance, not necessary)
+            # w2q4 end
 
             if UserInput == 1:
                 ExitMenu = True
