@@ -11,6 +11,7 @@ import random
 
 TILE = "[X]"
 NO_TILE = "[ ]"
+ALLOWED_DIRECTIONS = [[1,0], [0, 1], [1, 1]] # w3q1) needed constant
 
 Width = 4
 Height = 4
@@ -101,6 +102,11 @@ def ProcessMove(Move):
 
         return True # break out of function
 
+    # w3q1) diagonal movement notes
+    # only allow southeast direction, and utilize the existing move check to actually
+    # do this efficiently with less code
+    # an idea is to actually generalize the move check with an integer direction
+
     if "-" in Move:
         DashPos = Move.index("-")
         FirstRef = Move[0:DashPos]
@@ -115,12 +121,23 @@ def ProcessMove(Move):
     else:
         return False # w2q5) may make the following code redundant?
 
+    # w3q1) calculate directional movement
+    DirectionVector = [EndCoords[0] - StartCoords[0], EndCoords[1] - StartCoords[1]]
+    DirectionY = 1 if DirectionVector[0] > 0 else 0 if DirectionVector[0] == 0 else -1 # this has to be flipped
+    DirectionX = 1 if DirectionVector[1] > 0 else 0 if DirectionVector[1] == 0 else -1
+    DirectionVector = [DirectionX, DirectionY]
+
+    # only allow Direction Vectors of [1,0], [0, -1] and [1, -1] as of w3q1
+
     SquaresRemoved = 0 # w2q2) variable set
     if len(StartCoords) == 0 or len(EndCoords) == 0:
         return False
-    if StartCoords[0] != EndCoords[0] and StartCoords[1] != EndCoords[1]:
+
+    # w3q1) fix this selection to allow validation for diagonal directions.
+    if DirectionVector not in ALLOWED_DIRECTIONS:
         return False
-    if StartCoords[0] == EndCoords[0]:
+
+    if DirectionVector == ALLOWED_DIRECTIONS[0]: # w3q1) add our directions, and [0] is horizontal movement
         ToRemove = SquaresRemoved = EndCoords[1] - StartCoords[1] + 1
         # edit w2q2) set SquaresRemoved to same thing
         for Cell in range(StartCoords[1], EndCoords[1] + 1):
@@ -131,7 +148,7 @@ def ProcessMove(Move):
                 Board[StartCoords[0]][Cell] = NO_TILE
         else:
             return False
-    else:
+    elif DirectionVector == ALLOWED_DIRECTIONS[1]: # w3q1) add directions, [1] is vertical downwards movement
         ToRemove = SquaresRemoved = EndCoords[0] - StartCoords[0] + 1
         # edit w2q2) set squaresRemoved to toRemove's old value to preserve it
         # .. as ToRemove becomes 0 over runtime
@@ -142,6 +159,26 @@ def ProcessMove(Move):
         if ToRemove == 0:
             for Cell in range(StartCoords[0], EndCoords[0] + 1):
                 Board[Cell][StartCoords[1]] = NO_TILE
+        else:
+            return False
+    elif DirectionVector == ALLOWED_DIRECTIONS[2]: # w3q1) add directions [2] allowing DIAGONAL SOUTHEAST movement
+        # w3q1) preserve this, row difference is still the diagonal distance (squares needed to be removed)
+        ToRemove = SquaresRemoved = EndCoords[0] - StartCoords[0] + 1
+
+        # edit w2q2) set squaresRemoved to toRemove's old value to preserve it
+        # .. as ToRemove becomes 0 over runtime
+
+        # w3q1) this is a 1dim loop
+        # Note: use squares removed to offset otherwise it will bug out
+        for offset in range(0, SquaresRemoved):
+            # w3q1) offset beginning coordinates)
+            if Board[StartCoords[0] + offset][StartCoords[1] + offset] == TILE:
+                ToRemove -= 1 # follow sameish algorithm for w3q1
+
+        if ToRemove == 0:
+            # w3q1) transition to this 1dim iteration to actually allow the diagonal iteration.
+            for offset in range(0, SquaresRemoved):
+                Board[StartCoords[0] + offset][StartCoords[1] + offset] = NO_TILE
         else:
             return False
 
