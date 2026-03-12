@@ -77,13 +77,14 @@ def ProcessMove(Move):
         SecondRef = Move
     StartCoords = ConvertRefToCoords(FirstRef)
     EndCoords = ConvertRefToCoords(SecondRef)
-    SquaresRemoved = 0
+    SquaresRemoved = 0 # w2q2) variable set
     if len(StartCoords) == 0 or len(EndCoords) == 0:
         return False
     if StartCoords[0] != EndCoords[0] and StartCoords[1] != EndCoords[1]:
         return False
     if StartCoords[0] == EndCoords[0]:
-        ToRemove = EndCoords[1] - StartCoords[1] + 1
+        ToRemove = SquaresRemoved = EndCoords[1] - StartCoords[1] + 1
+        # edit w2q2) set SquaresRemoved to same thing
         for Cell in range(StartCoords[1], EndCoords[1] + 1):
             if Board[StartCoords[0]][Cell] == TILE:
                 ToRemove -= 1
@@ -177,7 +178,13 @@ def Main():
         while not ExitMenu:
             print()
             DisplayMenu(RandomOption)
-            UserInput = int(input("Enter a choice: "))
+
+            # w2q4) encapsulate in try except
+            try:
+                UserInput = int(input("Enter a choice: "))
+            except TypeError:
+                print("Invalid choice.")
+
             if UserInput == 1:
                 ExitMenu = True
                 ResetBoard(RandomOption)
