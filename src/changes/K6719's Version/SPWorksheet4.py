@@ -38,6 +38,22 @@ def GetRandomTile():
     else:
         return NO_TILE
 
+# w4q1) saveGame structure -- note additional feature added for multiple players as extension of
+# w3q2
+def SaveGame(Moves, ToFile="./default.txt"):
+    global Board, NumberOfPlayers
+    Metadata = f"{Width},{Height},{NumberOfPlayers}" # w4q1) e.g. 2/5/3
+
+    Body = "\n" # w4q1) main data
+    for Move in Moves:
+        Body += Move + "\n"
+
+    # write into file
+    with open(ToFile, "w+") as writer:
+        writer.write(Metadata + Body)
+        writer.close()
+
+
 def DisplayState(PlayerNumber):
     print("-------------------------")
     print(f"Player {PlayerNumber}'s turn")
@@ -248,6 +264,8 @@ def DisplayMenu(RandomOption):
     print("4 - Load test board (4 x 4)")
     # w3q2) add new display option
     print(f"5 - Set number of players (currently {NumberOfPlayers})")
+    # w4q1) i dont care aqa 6 is fine
+    print(f"6 - Load a game from a file.")
     print("9 - Quit")
 
 def LoadTestBoard():
@@ -272,12 +290,68 @@ def CheckGameOver():
     else:
         return False
 
-def PlayGame():
+# w4q1) stay here because we need alot of these subroutines
+def LoadAndPlayGame(RandomOption = True):
+    global Board, Width, Height, NumberOfPlayers
+
+    FileName = input("Please give the path to the file that needs to be read from: ")
+
+    try:
+        FileOutput = "" # w4q1) store files here.
+        with open(FileName, "r") as file:
+            FileOutput = file.readlines()
+            file.close()
+        if isinstance(FileOutput, str):  # w4q1) validate
+            print("Failed at reading the file somehow??")
+
+        Metadata = list(map(
+            int, FileOutput.pop(0).split(",")
+        ))  # w4q1) read metadata
+
+        Width, Height, NumberOfPlayers = Metadata[0], Metadata[1], Metadata[2]  # unpack values
+    except IOError: # w4q1) more validations
+        print("Errors in reading the actual file. Defaulting to 4x4 2p.")
+
+        Width, Height, NumberOfPlayers = 4, 4, 2
+
+    # w4q1) add validations
+    if not (2 <= Width <= 9 and 2 <= Height <= 9) or not (NumberOfPlayers > 1):
+        print("This file is invalid. Resetting to default 4x4 2p.")
+        Width, Height, NumberOfPlayers = 4, 4, 2
+
+    ResetBoard(RandomOption) # w4q1) utilize preexisting sub to reset the board
+
+    CurrentPlayer = 0
+
+    for Move in range(0, len(FileOutput)):
+        ProcessMove(FileOutput[Move]) # w4q1) process each move
+
+        # w4q1) calculate current player with modulus
+        CurrentPlayer += 1
+        CurrentPlayer %= NumberOfPlayers
+
+    return CurrentPlayer
+
+
+def PlayGame(NextPlayer="in"):
     print(f"Valid moves are within the range A1-{ConvertCoordsToRef(Height - 1, Width - 1)}")
     GameOver = False
-    NextPlayer = 1
+
+    # w4q1) loop to validate
+    if NextPlayer == "in" or not isinstance(NextPlayer, int): # w4q1) check is desired type
+        while True:
+            NextPlayer = int(input(f"Which player should start (1 to {NumberOfPlayers}): "))
+            if 1 <= NextPlayer <= NumberOfPlayers:
+                break
+            else:
+                print(f"Please enter a number between 1 and {NumberOfPlayers}")
+    else:
+        if not 1 <= NextPlayer <= NumberOfPlayers:
+            NextPlayer = 1 # w4q1) default to 1 if invalid
+
     # w3q3) add move counter
     Moves = 0
+    MoveList=[]
     while not GameOver:
         DisplayState(NextPlayer)
         print()
@@ -287,6 +361,9 @@ def PlayGame():
             IsValid = ProcessMove(Move)
             if not IsValid:
                 print("Not a valid move - try again")
+            else:
+                MoveList.append(Move) # w4q1) add the log.
+
         Moves += 1 # w3q3) increment
 
         DisplayStatistics(Moves) # w3q3) BEFORE wincheck
@@ -299,6 +376,15 @@ def PlayGame():
             print()
             print("Press enter to continue")
             input()
+
+        # w4q1) add save game option
+        # also make sure this is defaulted so u can save after the game ends as well
+        SaveOption = input(f"Would you like to save the game in its current state? (y/n): ").lower()
+
+        if SaveOption == "y":
+            SaveGame(MoveList, input("Where should I store it? (filename.ext / full path): "))
+        elif SaveOption not in ["n" or "y"]:
+            print("Do you actually think youre tough bro.")
 
 def Main():
     Playing = True
@@ -329,6 +415,10 @@ def Main():
                 LoadTestBoard()
             elif UserInput == 5:
                 SetNumberOfPlayers()
+            elif UserInput == 6: # w4q1) add new option
+                ExitMenu = True
+                NextPlayer = LoadAndPlayGame(RandomOption)
+                PlayGame(NextPlayer) # w4q1) note the new input
             elif UserInput == 9:
                 print("Thank you for playing")
                 ExitMenu = True
