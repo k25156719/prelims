@@ -218,6 +218,18 @@ def SetBoardSize():
     Width = int(input("Specify board width: "))
     Height = int(input("Specify board height: "))
 
+# w3q3) display statistics subroutine
+def DisplayStatistics(Moves):
+    SquaresTotal = Width * Height # w3q3) no need to iterate for this
+    SquaresActive = 0 # w3q3) count these squares
+
+    for x in range(Width):
+        for y in range(Height):
+            SquaresActive += 1 if Board[y][x] == TILE else 0
+
+    print(f"Tiles left / Total tiles: {SquaresActive}/{SquaresTotal}")
+    print(f"Total moves so far: {Moves}")
+
 def DisplayMenu(RandomOption):
     print("1 - Start game")
     print(f"2 - Set board size (currently {Width} x {Height})")
@@ -253,6 +265,8 @@ def PlayGame():
     print(f"Valid moves are within the range A1-{ConvertCoordsToRef(Height - 1, Width - 1)}")
     GameOver = False
     NextPlayer = 1
+    # w3q3) add move counter
+    Moves = 0
     while not GameOver:
         DisplayState(NextPlayer)
         print()
@@ -262,6 +276,9 @@ def PlayGame():
             IsValid = ProcessMove(Move)
             if not IsValid:
                 print("Not a valid move - try again")
+        Moves += 1 # w3q3) increment
+
+        DisplayStatistics(Moves) # w3q3) BEFORE wincheck
         NextPlayer = NextPlayer % NumberOfPlayers + 1 # w3q2) simply replace modulus
         if CheckGameOver():
             GameOver = True
