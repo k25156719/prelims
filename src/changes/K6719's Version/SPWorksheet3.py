@@ -215,8 +215,19 @@ def SetNumberOfPlayers():
 def SetBoardSize():
     global Width
     global Height
-    Width = int(input("Specify board width: "))
-    Height = int(input("Specify board height: "))
+
+    Validated = False
+
+    while not (2 <= Width <= 9 and 2 <= Height <= 9 and Validated): #w3q4) conditions
+        print("Please enter two numbers between 2 and 9.")
+        try:
+            Width = int(input("Specify board width: "))
+            Height = int(input("Specify board height: "))
+
+            Validated = 2 <= Width <= 9 and 2 <= Height <= 9
+        except:
+            print("Please enter valid integers for both fields.")
+            continue # w3q3) continue if non-integer
 
 # w3q3) display statistics subroutine
 def DisplayStatistics(Moves):
