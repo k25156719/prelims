@@ -11,11 +11,14 @@ import random
 
 TILE = "[X]"
 NO_TILE = "[ ]"
-ALLOWED_DIRECTIONS = [[1,0], [0, 1], [1, 1]] # w3q1) needed constant
+ALLOWED_DIRECTIONS = [[1,0], [0, 1], [1, 1], [0,0]] # w3q1) needed constant
 
 Width = 4
 Height = 4
 Board = []
+
+#w3q2) create global field NumPlayers
+NumberOfPlayers = 2
 
 def ResetBoard(RandomOption):
     global Board
@@ -181,11 +184,33 @@ def ProcessMove(Move):
                 Board[StartCoords[0] + offset][StartCoords[1] + offset] = NO_TILE
         else:
             return False
+    if FirstRef == SecondRef: # W3) minor edit global, js to allow single letter inputs
+        if Board[StartCoords[0]][StartCoords[1]] == TILE:
+            Board[StartCoords[0]][StartCoords[1]] = NO_TILE
+
+            SquaresRemoved = 1
+        else:
+            return False
 
     print(SquaresRemoved, "squares removed.")
     # edit w2q2) print out toRemove which stores the amount of squares removed
 
     return True
+
+#w3q2) setNumberOfPlayers subroutine, REMEMBER THE VALIDATION
+def SetNumberOfPlayers():
+    global NumberOfPlayers
+
+    # w3q2) success flag is NOT returned, no edit
+    try:
+        TrialValue = int(input("Specify number of players (>=2): "))
+
+        if TrialValue < 2: #w3q2) bound it to >2
+            print("Please enter a value above or equal to 2.")
+        else:
+            NumberOfPlayers = TrialValue
+    except:
+        print("Please enter a valid integer.")
 
 def SetBoardSize():
     global Width
@@ -198,6 +223,8 @@ def DisplayMenu(RandomOption):
     print(f"2 - Set board size (currently {Width} x {Height})")
     print(f"3 - Toggle random option (currently {RandomOption})")
     print("4 - Load test board (4 x 4)")
+    # w3q2) add new display option
+    print(f"5 - Set number of players (currently {NumberOfPlayers})")
     print("9 - Quit")
 
 def LoadTestBoard():
@@ -235,10 +262,10 @@ def PlayGame():
             IsValid = ProcessMove(Move)
             if not IsValid:
                 print("Not a valid move - try again")
-        NextPlayer = NextPlayer % 2 + 1
+        NextPlayer = NextPlayer % NumberOfPlayers + 1 # w3q2) simply replace modulus
         if CheckGameOver():
             GameOver = True
-            print(f"Game over - player {NextPlayer % 2 + 1} wins")
+            print(f"Game over - player {(NextPlayer - 1) % NumberOfPlayers} wins") #w3q2) same thing
             print()
             DisplayBoard()
             print()
@@ -272,6 +299,8 @@ def Main():
             elif UserInput == 4:
                 ExitMenu = True
                 LoadTestBoard()
+            elif UserInput == 5:
+                SetNumberOfPlayers()
             elif UserInput == 9:
                 print("Thank you for playing")
                 ExitMenu = True
