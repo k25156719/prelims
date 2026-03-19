@@ -38,6 +38,16 @@ def GetRandomTile():
     else:
         return NO_TILE
 
+# w5q1) count the tiles
+def CountTilesOnBoard():
+    global Board
+    Count = 0
+    for Row in range(Height):
+        for Column in range(Width):
+            Count += 1 if Board[Row][Column] == TILE else 0
+
+    return Count
+
 # w4q1) saveGame structure -- note additional feature added for multiple players as extension of
 # w3q2
 def SaveGame(Moves, ToFile="./default.txt"):
